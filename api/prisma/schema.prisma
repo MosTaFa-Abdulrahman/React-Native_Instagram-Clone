@@ -1,0 +1,228 @@
+// bunx dotenv -e .env -- prisma db push
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              Int       @id @default(autoincrement())
+  username        String    @unique
+  email           String    @unique
+  password        String
+  firstName        String?   @map("first_name")
+  lastName        String?   @map("last_name")
+  imgUrl          String?   @map("img_url")
+  coverImgUrl     String?   @map("cover_img_url")
+  city            String?
+  createdDate     DateTime  @default(now()) @map("created_date")
+  lastModifiedDate DateTime? @updatedAt @map("last_modified_date")
+
+  // Relationships
+  posts           Post[]
+  comments        Comment[]
+  replies         Reply[]
+  stories         Story[]
+  
+  // Followers and Following - FIXED RELATIONS
+  followers       Follow[]  @relation("UserFollowing")   // People who follow THIS user
+  following       Follow[]  @relation("UserFollowers")   // People THIS user follows
+  
+  // Likes
+  postLikes       PostLike[]
+  commentLikes    CommentLike[]
+  replyLikes      ReplyLike[]
+  
+  // Saved Posts
+  savedPosts      SavedPost[]
+  
+  // Notifications
+  notifications   Notification[] @relation("UserNotifications")
+  triggeredNotifications Notification[] @relation("TriggeredNotifications")
+
+  @@map("users")
+}
+
+model Post {
+  id              Int       @id @default(autoincrement())
+  title           String?
+  description     String?
+  imageUrl        String?   @map("image_url")
+  createdDate     DateTime  @default(now()) @map("created_date")
+  lastModifiedDate DateTime? @updatedAt @map("last_modified_date")
+  
+  // Relationships
+  userId          Int       @map("user_id")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  comments        Comment[]
+  likes           PostLike[]
+  savedBy         SavedPost[]
+
+  @@map("posts")
+}
+
+model Comment {
+  id              Int       @id @default(autoincrement())
+  text            String
+  createdDate     DateTime  @default(now()) @map("created_date")
+  lastModifiedDate DateTime? @updatedAt @map("last_modified_date")
+  
+  // Relationships
+  userId          Int       @map("user_id")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  postId          Int       @map("post_id")
+  post            Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  replies         Reply[]
+  likes           CommentLike[]
+
+  @@map("comments")
+}
+
+model Reply {
+  id              Int       @id @default(autoincrement())
+  text            String
+  createdDate     DateTime  @default(now()) @map("created_date")
+  lastModifiedDate DateTime? @updatedAt @map("last_modified_date")
+  
+  // Relationships
+  userId          Int       @map("user_id")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  commentId       Int       @map("comment_id")
+  comment         Comment   @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  
+  likes           ReplyLike[]
+
+  @@map("replies")
+}
+
+model Story {
+  id              Int       @id @default(autoincrement())
+  mediaUrl        String    @map("media_url")
+  expiredAt       DateTime  @map("expired_at")
+  createdDate     DateTime  @default(now()) @map("created_date")
+  lastModifiedDate DateTime? @updatedAt @map("last_modified_date")
+  
+  // Relationships
+  userId          Int       @map("user_id")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("stories")
+}
+
+model PostLike {
+  id              Int       @id @default(autoincrement())
+  createdDate     DateTime  @default(now()) @map("created_date")
+  lastModifiedDate DateTime? @updatedAt @map("last_modified_date")
+  
+  // Relationships
+  userId          Int       @map("user_id")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  postId          Int       @map("post_id")
+  post            Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@map("post_likes")
+}
+
+model CommentLike {
+  id              Int       @id @default(autoincrement())
+  createdDate     DateTime  @default(now()) @map("created_date")
+  lastModifiedDate DateTime? @updatedAt @map("last_modified_date")
+  
+  // Relationships
+  userId          Int       @map("user_id")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  commentId       Int       @map("comment_id")
+  comment         Comment   @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, commentId])
+  @@map("comment_likes")
+}
+
+model ReplyLike {
+  id              Int       @id @default(autoincrement())
+  createdDate     DateTime  @default(now()) @map("created_date")
+  lastModifiedDate DateTime? @updatedAt @map("last_modified_date")
+  
+  // Relationships
+  userId          Int       @map("user_id")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  replyId         Int       @map("reply_id")
+  reply           Reply     @relation(fields: [replyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, replyId])
+  @@map("reply_likes")
+}
+
+model SavedPost {
+  id              Int       @id @default(autoincrement())
+  createdDate     DateTime  @default(now()) @map("created_date")
+  lastModifiedDate DateTime? @updatedAt @map("last_modified_date")
+  
+  // Relationships
+  userId          Int       @map("user_id")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  postId          Int       @map("post_id")
+  post            Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([userId])
+  @@index([postId])
+  @@index([createdDate(sort: Desc)])
+  @@map("saved_posts")
+}
+
+model Follow {
+  id              Int       @id @default(autoincrement())
+  createdDate     DateTime  @default(now()) @map("created_date")
+  lastModifiedDate DateTime? @updatedAt @map("last_modified_date")
+  
+  // Relationships
+  followerId      Int       @map("follower_id")
+  follower        User      @relation("UserFollowers", fields: [followerId], references: [id], onDelete: Cascade)
+  
+  followingId     Int       @map("following_id")
+  following       User      @relation("UserFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@map("user_follows")
+}
+
+model Notification {
+  id              Int       @id @default(autoincrement())
+  title           String
+  message         String
+  isRead          Boolean   @default(false) @map("is_read")
+  type            NotificationType
+  referenceId     Int?      @map("reference_id")
+  createdDate     DateTime  @default(now()) @map("created_date")
+  lastModifiedDate DateTime? @updatedAt @map("last_modified_date")
+  
+  // Relationships
+  userId          Int       @map("user_id")
+  user            User      @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  
+  triggeredByUserId Int     @map("triggered_by_user_id")
+  triggeredByUser User      @relation("TriggeredNotifications", fields: [triggeredByUserId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  LIKE
+  COMMENT
+  REPLY
+  FOLLOW
+}
