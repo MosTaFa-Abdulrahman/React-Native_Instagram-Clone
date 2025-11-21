@@ -61,13 +61,7 @@ https://github.com/user-attachments/assets/88a1cdbe-c4e6-4ead-ba48-80decc2293ac
 - 🔄 Add multiple stories in a row 
 
 ---
-
-### 💳 Payments & Transactions  
-- 💰 Store purchase transactions  
-- 👨‍💼 Payments restricted to Admins  
-- 🎓 Add purchased courses to user profile
-
----
+د
 
 ### 🔔 Notifications  
 - Triggered by:  
@@ -110,7 +104,7 @@ https://github.com/user-attachments/assets/88a1cdbe-c4e6-4ead-ba48-80decc2293ac
 - Cloudinary (media uploads)  
 
 **Mobile (React-Native, Expo)**  
-- React Native  
+- React Native
 - Expo Router  
 - AsyncStorage
 - React-Query (tansStack)  
