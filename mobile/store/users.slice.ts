@@ -20,6 +20,8 @@ import {
   GetAllUsersParams,
   GetFollowersParams,
   GetFollowingParams,
+  GetSuggestedUsersParams,
+  GetSuggestedUsersResponse,
 } from "../types/users.types";
 
 // *********************************** ((API Functions)) **************************************** //
@@ -267,6 +269,36 @@ export const useInfiniteUsers = (params?: Omit<GetAllUsersParams, "page">) => {
     queryKey: ["users", "infinite", params],
     queryFn: ({ pageParam = 1 }) =>
       fetchAllUsers({ ...params, page: pageParam as number }),
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    initialPageParam: 1,
+  });
+};
+
+// *************************************************** //
+// Get Suggested Users
+const fetchSuggestedUsers = async (
+  params?: GetSuggestedUsersParams
+): Promise<GetSuggestedUsersResponse> => {
+  const queryParams = new URLSearchParams();
+  if (params?.page) queryParams.append("page", params.page.toString());
+  if (params?.size) queryParams.append("size", params.size.toString());
+
+  const response = await makeRequest.get(
+    `/users/suggested?${queryParams.toString()}`
+  );
+  return response.data;
+};
+// Hook with Infinite Scroll
+export const useInfiniteSuggestedUsers = (
+  params?: Omit<GetSuggestedUsersParams, "page">
+) => {
+  return useInfiniteQuery({
+    queryKey: ["users", "suggested", params],
+    queryFn: ({ pageParam = 1 }) =>
+      fetchSuggestedUsers({ ...params, page: pageParam as number }),
     getNextPageParam: (lastPage) => {
       const { page, totalPages } = lastPage;
       return page < totalPages ? page + 1 : undefined;

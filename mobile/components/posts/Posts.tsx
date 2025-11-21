@@ -1,12 +1,12 @@
 import { styles } from "@/styles/home.styles";
-import { useState } from "react";
-import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
+import { useState } from "react";
+import { Alert, Text, TouchableOpacity, View } from "react-native";
 
 // Icons & Constants
-import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "@/constants/theme";
+import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 
 // Components

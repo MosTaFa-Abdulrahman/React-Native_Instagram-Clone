@@ -7,6 +7,7 @@ export interface User {
   imgUrl: string | null;
   coverImgUrl: string | null;
   city: string | null;
+  isFollowing: boolean;
   createdDate: string;
   _count?: {
     posts: number;
@@ -39,6 +40,13 @@ export interface FollowRelation {
   follower?: User;
   following?: User;
 }
+
+export type GetSuggestedUsersParams = {
+  page?: number;
+  size?: number;
+};
+
+export type GetSuggestedUsersResponse = GetAllUsersResponse;
 
 // API Response Types
 export interface GetAllUsersResponse extends PaginatedResponse<User> {}

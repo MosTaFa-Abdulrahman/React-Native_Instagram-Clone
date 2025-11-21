@@ -80,6 +80,14 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="suggested-users"
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="people" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="bookmarks"
         options={{
           tabBarIcon: ({ color, size }) => (

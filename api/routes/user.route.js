@@ -7,11 +7,13 @@ const {
   followUser,
   getUserFollowers,
   getUserFollowing,
+  getSuggestedUsers,
 } = require("../controllers/user.controller");
 const { authenticate } = require("../middlewares/auth.middleware");
 
 // User Profile Operations
 router.get("/", authenticate, getAllUsers);
+router.get("/suggested", authenticate, getSuggestedUsers);
 router.get("/:userId", authenticate, getUserProfile);
 router.patch("/me", authenticate, updateUser);
 router.delete("/me", authenticate, deleteUser);

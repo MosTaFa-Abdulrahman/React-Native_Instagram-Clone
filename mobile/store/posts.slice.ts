@@ -9,19 +9,19 @@ import { makeRequest } from "../requestMethod";
 
 // Types
 import {
-  CreatePostResponse,
-  GetPostResponse,
-  GetAllPostsResponse,
-  GetUserPostsResponse,
-  UpdatePostResponse,
-  DeletePostResponse,
-  LikePostResponse,
-  GetPostLikesResponse,
   CreatePostRequest,
-  UpdatePostRequest,
+  CreatePostResponse,
+  DeletePostResponse,
   GetAllPostsParams,
-  GetUserPostsParams,
+  GetAllPostsResponse,
   GetPostLikesParams,
+  GetPostLikesResponse,
+  GetPostResponse,
+  GetUserPostsParams,
+  GetUserPostsResponse,
+  LikePostResponse,
+  UpdatePostRequest,
+  UpdatePostResponse,
 } from "../types/posts.types";
 
 // *********************************** ((API Functions)) **************************************** //

@@ -1,16 +1,16 @@
-import { styles } from "./auth.styles";
+import { makeRequest } from "@/requestMethod";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { makeRequest } from "@/requestMethod";
+import { styles } from "./auth.styles";
 
 function Register() {
   const [username, setUsername] = useState("");

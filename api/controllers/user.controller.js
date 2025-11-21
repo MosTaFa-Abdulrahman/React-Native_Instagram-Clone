@@ -459,6 +459,93 @@ const getUserFollowing = async (req, res) => {
   }
 };
 
+// Get Suggested Users (users not followed by current user)
+const getSuggestedUsers = async (req, res) => {
+  try {
+    const currentUserId = req.user.userId || req.user.id;
+    const page = parseInt(req.query.page) || 1;
+    const size = parseInt(req.query.size) || 10;
+    const skip = (page - 1) * size;
+
+    // Get IDs of users that current user is already following
+    const following = await prisma.follow.findMany({
+      where: {
+        followerId: currentUserId,
+      },
+      select: {
+        followingId: true,
+      },
+    });
+
+    const followingIds = following.map((f) => f.followingId);
+
+    // Get users that current user is NOT following (excluding self)
+    const whereClause = {
+      id: {
+        notIn: [...followingIds, currentUserId],
+      },
+    };
+
+    const [users, totalElements] = await Promise.all([
+      prisma.user.findMany({
+        where: whereClause,
+        skip,
+        take: size,
+        orderBy: [
+          {
+            followers: {
+              _count: "desc", // Sort by most followed users first
+            },
+          },
+          {
+            createdDate: "desc",
+          },
+        ],
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          imgUrl: true,
+          coverImgUrl: true,
+          city: true,
+          createdDate: true,
+          _count: {
+            select: {
+              posts: true,
+              followers: true,
+              following: true,
+            },
+          },
+        },
+      }),
+      prisma.user.count({ where: whereClause }),
+    ]);
+
+    // Add isFollowing field (will be false for all suggested users)
+    const usersWithFollowStatus = users.map((user) => ({
+      ...user,
+      isFollowing: false,
+    }));
+
+    const totalPages = Math.ceil(totalElements / size);
+
+    res.status(200).json({
+      content: usersWithFollowStatus,
+      page,
+      size,
+      totalElements,
+      totalPages,
+      first: page === 1,
+      last: page === totalPages,
+    });
+  } catch (error) {
+    console.error("Get suggested users error:", error);
+    res.status(500).json({ error: "Failed to fetch suggested users" });
+  }
+};
+
 module.exports = {
   getAllUsers,
   getUserProfile,
@@ -467,4 +554,5 @@ module.exports = {
   followUser,
   getUserFollowers,
   getUserFollowing,
+  getSuggestedUsers,
 };

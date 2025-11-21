@@ -1,18 +1,18 @@
-import { styles } from "../../styles/home.styles";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   RefreshControl,
   Text,
   TouchableOpacity,
   View,
-  ActivityIndicator,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { styles } from "../../styles/home.styles";
 
 // Icons & Constants
-import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "@/constants/theme";
+import { Ionicons } from "@expo/vector-icons";
 
 // Components
 import { Loader } from "@/components/global/Loader";
